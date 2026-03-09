@@ -25,13 +25,13 @@ func evaluate(m *Model, X *mat.Dense, y []float64) float64 {
 	return float64(correct) / float64(len(y)) * 100
 }
 
-func confusionMatrix(preds, actual []float64) [2][2]int {
-	var cm[2][2]int
-	for i := range preds {
-		cm[int(actual[i])][int(preds[i])]++
-	}
-	return cm
-}
+// func confusionMatrix(preds, actual []float64) [2][2]int {
+// 	var cm[2][2]int
+// 	for i := range preds {
+// 		cm[int(actual[i])][int(preds[i])]++
+// 	}
+// 	return cm
+// }
 
 // splitRowMajor splits a matrix with rows as samples.
 func splitRowMajor(features *mat.Dense, outcomes []float64, testSize float64) (*mat.Dense, []float64, *mat.Dense, []float64) {
@@ -66,6 +66,25 @@ func splitRowMajor(features *mat.Dense, outcomes []float64, testSize float64) (*
     return trainMat, trainOut, valMat, valOut
 }
 
+func printSizesHeader(trainHeader, testHeader []string, trainFeatures, X_train, X_val, testFeatures, trainBias, testBias *mat.Dense, y_train, y_val []float64) {
+	fmt.Println("Train column names:\n", trainHeader)
+	fmt.Printf("Train features: %v x %v\n", trainFeatures.RawMatrix().Rows, trainFeatures.RawMatrix().Cols)
+	fmt.Printf("X_Train: %v x %v | X_val: %v x %v\n", X_train.RawMatrix().Rows, X_train.RawMatrix().Cols, X_val.RawMatrix().Rows, X_val.RawMatrix().Cols)
+	fmt.Printf("y_Train: %v | y_val: %v\n", len(y_train), len(y_val))
+
+	fmt.Printf("\n")
+
+	fmt.Println("Test column names:\n", testHeader)
+	fmt.Printf("Test features: %v x %v\n", testFeatures.RawMatrix().Rows, testFeatures.RawMatrix().Cols)
+
+	fmt.Printf("\n")
+
+	fmt.Println("Train standardized features (first row):\n", mat.Row(nil, 0, trainBias))
+	fmt.Println("Test standardized features (first row):\n", mat.Row(nil, 0,testBias))
+
+	fmt.Println("--------------------------------------------------------------")
+}
+
 func main() {
 	// Loading datasets from CSV files
 	trainFeatures, trainOutcomes, trainHeader, err := loadCSV("data/diabetes_train.csv", true)
@@ -90,23 +109,8 @@ func main() {
 	rand.New(rand.NewSource(42)) 
 	X_train, y_train, X_val, y_val := splitData(trainBias, trainOutcomes, 0.2)
 
-	// Printing Dataset sizes and headers
-	fmt.Println("Train column names:\n", trainHeader)
-	fmt.Printf("Train features: %v x %v\n", trainFeatures.RawMatrix().Rows, trainFeatures.RawMatrix().Cols)
-	fmt.Printf("X_Train: %v x %v | X_val: %v x %v\n", X_train.RawMatrix().Rows, X_train.RawMatrix().Cols, X_val.RawMatrix().Rows, X_val.RawMatrix().Cols)
-	fmt.Printf("y_Train: %v | y_val: %v\n", len(y_train), len(y_val))
-
-	fmt.Printf("\n")
-
-	fmt.Println("Test column names:\n", testHeader)
-	fmt.Printf("Test features: %v x %v\n", testFeatures.RawMatrix().Rows, testFeatures.RawMatrix().Cols)
-
-	fmt.Printf("\n")
-
-	fmt.Println("Train standardized features (first row):\n", mat.Row(nil, 0, trainBias))
-	fmt.Println("Test standardized features (first row):\n", mat.Row(nil, 0,testBias))
-
-	fmt.Println("--------------------------------------------------------------")
+	// Printing the sizes of matrices and Headers
+	printSizesHeader(trainHeader, testHeader, trainFeatures, X_train, X_val, testFeatures, trainBias, testBias, y_train, y_val)
 
 	// trainMat := mat.DenseCopyOf(trainBias.T())
 	// testMat := mat.DenseCopyOf(testBias.T())
@@ -121,7 +125,7 @@ func main() {
 	hiddenSize := 1000
 	model := NewModel(inputSize, hiddenSize)
 
-	model.Fit(X_train, y_train, 0.1, 200)
+	model.Fit(X_train, y_train, 0.01, 200)
 
 	trainAcc := evaluate(model, X_train, y_train)
 	valAcc := evaluate(model, X_val, y_val)

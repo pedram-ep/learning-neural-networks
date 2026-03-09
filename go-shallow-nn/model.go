@@ -43,7 +43,7 @@ func (m *Model) Predict(X *mat.Dense) (A1, A2 *mat.Dense) {
 	A1 = &mat.Dense{}
 	A1.Apply(func(i, j int, v float64) float64 { return relu(v) }, &Z1)
 
-	Z2.Mul(m.W2, X)
+	Z2.Mul(m.W2, A1)
 
 	A2 = &mat.Dense{}
 	A2.Apply(func(i, j int, v float64) float64 { return sigmoid(v) }, &Z2)

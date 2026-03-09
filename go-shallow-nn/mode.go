@@ -50,3 +50,47 @@ func (m *Model) Predict(X *mat.Dense) (A1, A2 *mat.Dense) {
 
 	return A1, A2
 }
+
+func (m *Model) UpdateWeights(X, A1, A2 *mat.Dense, y []float64, learningRate float64) {
+	n := float64(X.RawMatrix().Cols)
+	yMat := mat.NewDense(1, len(y), y)
+
+	var diff, prod, oneMinusA2, shared mat.Dense
+	diff.Sub(yMat, A2)
+	prod.MulElem(&diff, A2)
+	oneMinusA2.Apply(func(_, _ int, v float64) float64 {return 1 - v }, A2)
+	prod.MulElem(&prod, &oneMinusA2)
+	shared.Scale(2/n, &prod)
+
+	var sharedTimesA1T mat.Dense
+	sharedTimesA1T.Mul(&shared, A1.T())
+	deltaW2 := new(mat.Dense)
+	deltaW2.Scale(learningRate, &sharedTimesA1T)
+	m.W2.Add(m.W2, deltaW2)
+
+	reluGrad := new(mat.Dense)
+	reluGrad.Apply(func(i, j int, v float64) float64 {
+		if v > 0 {
+			return 1
+		}
+		return 0
+	}, A1)
+
+	var sharedT mat.Dense
+	sharedT.CloneFrom(shared.T())
+	var sharedT_W2 mat.Dense
+	sharedT_W2.Mul(&sharedT, m.W2)
+	
+	var temp mat.Dense
+	temp.CloneFrom(sharedT_W2.T())
+
+	var grad mat.Dense
+	grad.MulElem(&temp, reluGrad)
+
+	var grad_XT mat.Dense
+	grad_XT.Mul(&grad, X.T())
+
+	deltaW1 := new(mat.Dense)
+	deltaW1.Scale(learningRate, &grad_XT)
+	m.W1.Add(m.W1, deltaW1)
+}

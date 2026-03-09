@@ -12,6 +12,26 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
+type Model struct {
+	W1 *mat.Dense
+	W2 *mat.Dense
+}
+
+func newModel(inputSize, hiddenSize int) *Model {
+	w1Data := make([]float64, hiddenSize*inputSize)
+	w2Data := make([]float64, 1*hiddenSize)
+	for i := range w1Data {
+		w1Data[i] = 0.01 * rand.NormalFloat64()
+	}
+	for i := range w2Data {
+		w2Data[i] = 0.01 * rand.NormFloat64()
+	}
+	return &Model{
+		W1: mat.NewDense(hiddenSize, inputSize, w1Data),
+		W2: mat.NewDense(1, hiddenSize, w2Data),
+	}
+}
+
 func loadCSV(path string, hasOutcome bool) (*mat.Dense, []float64, []string, error) {
 	f, err := os.Open(path)
 	if err != nil {

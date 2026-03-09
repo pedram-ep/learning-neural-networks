@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"math/rand"
 	"os"
 	"strconv"
 
@@ -119,13 +120,48 @@ func addBias(m *mat.Dense) *mat.Dense {
 	return mat.NewDense(r, c+1, newData)
 }
 
+func splitData(features *mat.Dense, outcomes []float64, testSize float64) (*mat.Dense, []float64, *mat.Dense, []float64) {
+	r, c := features.Dims()
+	nTest := int(float64(r) * testSize)
+	nTrain := r - nTest
+
+	// shuffle indices
+	indices := rand.Perm(r)
+	trainRows := indices[:nTrain]
+	valRows := indices[nTrain:]
+
+	// Build train matrix
+	trainData := make([]float64, nTrain*c)
+	trainOut := make([]float64, nTrain)
+	for i, idx := range trainRows {
+		for j := 0; j < c; j++ {
+			trainData[i*c+j] = features.At(idx, j)
+		}
+		trainOut[i] = outcomes[idx]
+	}
+
+	// Build validation matrix
+	valData := make([]float64, nTest*c)
+	valOut := make([]float64, nTest)
+	for i, idx := range valRows {
+		for j := 0; j < c; j++ {
+			valData[i*c+j] = features.At(idx, j)
+		}
+		valOut[i] = outcomes[idx]
+	}
+
+	trainMat := mat.NewDense(nTrain, c, trainData)
+	valMat := mat.NewDense(nTest, c, valData)
+	return trainMat, trainOut, valMat, valOut
+}
+
 func main() {
 	// Loading datasets from CSV files
-	trainFeatures, _, header, err := loadCSV("data/diabetes_train.csv", true)
+	trainFeatures, trainOutcomes, trainHeader, err := loadCSV("data/diabetes_train.csv", true)
 	if err != nil {
 		log.Fatal(err)
 	}
-	testFeatures, _, header, err := loadCSV("data/diabetes_test.csv", false)
+	testFeatures, _, testHeader, err := loadCSV("data/diabetes_test.csv", false)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -136,16 +172,25 @@ func main() {
 	testNorm := standardize(testFeatures, means, stds)
 
 	// Adding bias term to both train and test
-	trainNorm = addBias(trainNorm)
-	testNorm = addBias(testNorm)
+	trainBias := addBias(trainNorm)
+	testBias := addBias(testNorm)
 
-	fmt.Println("Train column names:", header)
+	// Splitting datasets
+	rand.New(rand.NewSource(42)) 
+	X_train, y_train, X_val, y_val := splitData(trainBias, trainOutcomes, 0.2)
+
+	fmt.Println("Train column names:\n", trainHeader)
 	fmt.Printf("Train features: %v x %v\n", trainFeatures.RawMatrix().Rows, trainFeatures.RawMatrix().Cols)
-	fmt.Println("Train standardized features (first row):", mat.Row(nil, 0, trainNorm))
+	fmt.Printf("X_Train: %v x %v | X_val: %v x %v\n", X_train.RawMatrix().Rows, X_train.RawMatrix().Cols, X_val.RawMatrix().Rows, X_val.RawMatrix().Cols)
+	fmt.Printf("y_Train: %v | y_val: %v\n", len(y_train), len(y_val))
 
 	fmt.Printf("\n")
 
-	fmt.Println("Test column names:", header)
+	fmt.Println("Test column names:\n", testHeader)
 	fmt.Printf("Test features: %v x %v\n", testFeatures.RawMatrix().Rows, testFeatures.RawMatrix().Cols)
-	fmt.Println("Test standardized features (first row):", mat.Row(nil, 0,testNorm))
+
+	fmt.Printf("\n")
+
+	fmt.Println("Train standardized features (first row):\n", mat.Row(nil, 0, trainBias))
+	fmt.Println("Test standardized features (first row):\n", mat.Row(nil, 0,testBias))
 }

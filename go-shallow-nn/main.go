@@ -92,7 +92,35 @@ func computeMeanStd(m *mat.Dense) ([]float64, []float64) {
 
 func sqrt(x float64) float64 { return math.Sqrt(x) }
 
+func standardize(m *mat.Dense, means []float64, stds []float64) *mat.Dense {
+	r, c := m.Dims()
+	data := make([]float64, r*c)
+
+	for i := 0; i < r; i++ {
+		for j := 0; j < c; j++ {
+			val := m.At(i, j)
+			data[i*c + j] = (val - means[j]) / stds[j]
+
+		}
+	}
+	return mat.NewDense(r, c, data)
+}
+
+func addBias(m *mat.Dense) *mat.Dense {
+	r, c := m.Dims()
+	newData := make([]float64, r*(c+1))
+	for i := 0; i < r; i++ {
+		for j := 0; j < c; j++ {
+			newData[i*(c+1) + j] = m.At(i, j)
+		}
+		newData[i*(c+1) + c] = 1.0
+	}
+
+	return mat.NewDense(r, c+1, newData)
+}
+
 func main() {
+	// Loading datasets from CSV files
 	trainFeatures, _, header, err := loadCSV("data/diabetes_train.csv", true)
 	if err != nil {
 		log.Fatal(err)
@@ -102,9 +130,22 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Computing mean and std for all columns, and then standardizing both train and test
+	means, stds := computeMeanStd(trainFeatures)
+	trainNorm := standardize(trainFeatures, means, stds)
+	testNorm := standardize(testFeatures, means, stds)
+
+	// Adding bias term to both train and test
+	trainNorm = addBias(trainNorm)
+	testNorm = addBias(testNorm)
+
 	fmt.Println("Train column names:", header)
 	fmt.Printf("Train features: %v x %v\n", trainFeatures.RawMatrix().Rows, trainFeatures.RawMatrix().Cols)
+	fmt.Println("Train standardized features (first row):", mat.Row(nil, 0, trainNorm))
+
+	fmt.Printf("\n")
 
 	fmt.Println("Test column names:", header)
 	fmt.Printf("Test features: %v x %v\n", testFeatures.RawMatrix().Rows, testFeatures.RawMatrix().Cols)
+	fmt.Println("Test standardized features (first row):", mat.Row(nil, 0,testNorm))
 }

@@ -94,3 +94,24 @@ func (m *Model) UpdateWeights(X, A1, A2 *mat.Dense, y []float64, learningRate fl
 	deltaW1.Scale(learningRate, &grad_XT)
 	m.W1.Add(m.W1, deltaW1)
 }
+
+func (m *Model) Fit(X *mat.Dense, y []float64, learningRate float64, epochs int) {
+	for epoch := 0; epoch < epochs; epoch++ {
+		A1, A2 := m.Predict(X)
+
+		yMat := mat.NewDense(1, len(y), y)
+
+		var diff mat.Dense
+		diff.Sub(yMat, A2)
+
+		var sq mat.Dense
+		sq.MulElem(&diff, &diff)
+		loss := mat.Sum(&sq) / float64(len(y))
+
+		if epoch%10 == 0 {
+			println("Epoch:", epoch, "Loss:", loss)
+		}
+
+		m.UpdateWeights(X, A1, A2, y, learningRate)
+	}
+}

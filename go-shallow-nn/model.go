@@ -20,7 +20,7 @@ func relu(x float64) float64 {
 	return 0
 }
 
-func newModel(inputSize, hiddenSize int) *Model {
+func NewModel(inputSize, hiddenSize int) *Model {
 	w1Data := make([]float64, hiddenSize*inputSize)
 	w2Data := make([]float64, 1*hiddenSize)
 	for i := range w1Data {

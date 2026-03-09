@@ -21,7 +21,7 @@ func newModel(inputSize, hiddenSize int) *Model {
 	w1Data := make([]float64, hiddenSize*inputSize)
 	w2Data := make([]float64, 1*hiddenSize)
 	for i := range w1Data {
-		w1Data[i] = 0.01 * rand.NormalFloat64()
+		w1Data[i] = 0.01 * rand.NormFloat64()
 	}
 	for i := range w2Data {
 		w2Data[i] = 0.01 * rand.NormFloat64()
@@ -173,6 +173,31 @@ func splitData(features *mat.Dense, outcomes []float64, testSize float64) (*mat.
 	trainMat := mat.NewDense(nTrain, c, trainData)
 	valMat := mat.NewDense(nTest, c, valData)
 	return trainMat, trainOut, valMat, valOut
+}
+
+func sigmoid(x float64) float64 { return 1.0 / (1.0 + math.Exp(-x))}
+
+func relu(x float64) float64 {
+	if x > 0 {
+		return x
+	}
+	return 0
+}
+
+func (m *Model) Predict(X *mat.Dense) (A1, A2 *mat.Dense) {
+	var Z1, Z2 mat.Dense
+
+	Z1.Mul(m.W1, X)
+
+	A1 = &mat.Dense{}
+	A1.Apply(func(i, j int, v float64) float64 { return relu(v) }, &Z1)
+
+	Z2.Mul(m.W2, X)
+
+	A2 = &mat.Dense{}
+	A2.Apply(func(i, j int, v float64) float64 { return sigmoid(v) }, &Z2)
+
+	return A1, A2
 }
 
 func main() {

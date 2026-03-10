@@ -37,8 +37,16 @@ A shallow neural network with one hidden layer (1000 neurons) using ReLU activat
 
 ## Results
 
-- Training accuracy: ~65%
-- Validation accuracy: ~63%
+| Metric | Training Set | Validation Set |
+| ------ | ------------ | -------------- |
+| True Positives | $33$ | $17$ |
+| True Negatives | $349$ | $79$ |
+| False Positives | $5$ | $4$ |
+| False Negatives | $148$ | $33$ |
+| Accuracy | $0.07140$ | $0.7218$ |
+| Precision | $0.8684$ | $0.8095$ |
+| Recall | $0.1823$ | $0.3400$ |
+| F1 Score | $0.3014$ | $0.4789$ |
 
 ## Requirements
 

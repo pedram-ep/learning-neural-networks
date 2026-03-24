@@ -16,4 +16,11 @@ A from-scratch implementation of a shallow neural network with one hidden layer 
 A Go port of the shallow neural network diabetes prediction model. Demonstrates the same neural network concepts with manual backpropagation implementation. [More details](./go-shallow-nn/README.md)
 
 **Languages and Tools:** Go
-**Tags:** `from-scratch`, `classification`, `backpropagation`, `port`
+**Tags:** `from-scratch`, `classification`, `backpropagation`
+
+### [Regularization Methods For Deep Learning](./regularization-l1l2-dropout/)
+
+In this mini-project, I've used Keras to implement a simple four-layered neural network. To avoid over-fitting, there are different methods of "Regularization" to apply on a neural net. Here, the methods "Dropout", "L1", "L2", and the combinational method "L1L2" are used and compared. [More details](./regularization-l1l2-dropout/README.md)
+
+**Languages and Tools:** Python, Keras, Tensorflow
+**Tags:** `regularization`, `dropout`, `lasso`, `ridge`

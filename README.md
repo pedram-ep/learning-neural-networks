@@ -1,6 +1,6 @@
 # Learning Neural Networks
 
-A collection of all projects and mini-projects I've developed in the field of neural networks. These projects were created so I would learn the main concepts in the neural networks field, starting from MLP and moving towards more complex neural networks and deep learning models.
+A collection of all projects and mini-projects I've developed in the field of neural networks. These projects were done with the goal of gaining more knowledge in the neural networks field, starting from MLP and moving towards more complex neural networks, eventually focusing on deep learning models such as CNNs and GNNs.
 
 ## Mini-projects
 

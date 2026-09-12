@@ -241,3 +241,8 @@ go.work.sum
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+
+
+### mine
+medical-image-cnn/data/

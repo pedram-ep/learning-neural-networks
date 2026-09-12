@@ -25,7 +25,7 @@ def save_checkpoint(
     optimizer: torch.optim.Optimizer,
     scheduler,
     epoch: int,
-    best_val_loss: float,
+    best_score: float,
 ):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     torch.save(
@@ -34,7 +34,7 @@ def save_checkpoint(
             "model_state_dict": model.state_dict(),
             "optimizer_state_dict": optimizer.state_dict(),
             "scheduler_state_dict": scheduler.state_dict() if scheduler else None,
-            "best_val_loss": best_val_loss,
+            "best_score": best_score,
         },
         path,
     )

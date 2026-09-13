@@ -73,12 +73,11 @@ class ResNetEncoder(nn.Module):
     Output: (B, 512)
     """
 
-    def __init__(self, pretrained: bool = True, freeze_backbone: bool = False):
+    def __init__(self, pretrained: bool = True,):
         super().__init__()
 
         weights = models.ResNet18_Weights.IMAGENET1K_V1 if pretrained else None
         self.backbone = models.resnet18(weights=weights)
-        self._freeze_bn = freeze_backbone
 
         old_conv = self.backbone.conv1
         new_conv = nn.Conv2d(
@@ -96,28 +95,8 @@ class ResNetEncoder(nn.Module):
         self.backbone.fc = nn.Identity()
         self.feat_dim = 512
 
-        # Optionally freeze the pretrained backbone (keep conv1 trainable).
-        if freeze_backbone:
-            for p in self.backbone.parameters():
-                p.requires_grad = False
-            for p in self.backbone.conv1.parameters():
-                p.requires_grad = True
-
-            for m in self.backbone.modules():
-                if isinstance(m, nn.BatchNorm2d):
-                    m.eval()
-                    m.momentum = None
-
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.backbone(x)
-
-    def train(self, mode: bool = True):
-        super().train(mode)
-        if self._freeze_bn:
-            for m in self.backbone.modules():
-                if isinstance(m, nn.BatchNorm2d):
-                    m.eval()
-        return self
 
 
 # ---------------------------------------------------------------------------
@@ -130,7 +109,7 @@ def build_encoder() -> nn.Module:
     if name == "resnet18":
         return ResNetEncoder(
             pretrained=getattr(config, "PRETRAINED", True),
-            freeze_backbone=getattr(config, "FREEZE_BACKBONE", False),
+            # freeze_backbone=getattr(config, "FREEZE_BACKBONE", False),
         )
     return CNNEncoder()
 

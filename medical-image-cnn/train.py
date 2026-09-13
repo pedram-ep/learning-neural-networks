@@ -193,7 +193,6 @@ def main():
         alpha=config.ALPHA,
         beta=config.BETA,
         weight_a=None if config.ENCODER_TYPE == "cnn" else weights_a.to(device),
-        # weight_a=weights_a.to(device),
         pos_weight_b=pos_weight_b.to(device),
     )
 
@@ -203,8 +202,8 @@ def main():
 
     optimizer = optim.AdamW(
         [
-            {"params": backbone_params, "lr": config.LR * 0.1},   # 1e-5
-            {"params": head_params,     "lr": config.LR},          # 1e-4
+            {"params": backbone_params, "lr": config.LR * 0.1},
+            {"params": head_params,     "lr": config.LR},
         ],
         weight_decay=config.WEIGHT_DECAY,
     )

@@ -48,7 +48,6 @@ ENCODER_TYPE = "cnn"
 
 # Only used when ENCODER_TYPE == "resnet18"
 PRETRAINED = True
-FREEZE_BACKBONE = False
 
 def get_device() -> torch.device:
     if DEVICE_OVERRIDE is not None:

@@ -27,6 +27,8 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--device", type=str, default=None,
                         help="Override device: 'cpu' or 'cuda'")
+    parser.add_argument("--encodertype", type=str, default="cnn",
+                        help="Override encoder type: 'cnn' or 'resnet18'")
     parser.add_argument("--checkpoint", type=str, default="checkpoints/best.pt")
     parser.add_argument("--epochs", type=int, default=config.EPOCHS)
     return parser.parse_args()
@@ -161,6 +163,12 @@ def main():
     device = config.get_device()
     print(f"[Device] Using: {device}")
 
+    # ----- Encoder -----
+    if args.encodertype == "cnn":
+        config.ENCODER_TYPE = "cnn"
+    elif args.encodertype == "resnet18":
+        config.ENCODER_TYPE = "resnet18"
+
     # ----- Reproducibility -----
     set_seed(config.SEED)
 
@@ -184,8 +192,8 @@ def main():
     criterion = MultiTaskLoss(
         alpha=config.ALPHA,
         beta=config.BETA,
-        # weight_a=None,
-        weight_a=weights_a.to(device),
+        weight_a=None if config.ENCODER_TYPE == "cnn" else weights_a.to(device),
+        # weight_a=weights_a.to(device),
         pos_weight_b=pos_weight_b.to(device),
     )
 

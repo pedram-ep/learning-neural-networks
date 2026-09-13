@@ -20,12 +20,12 @@ NUM_WORKERS = 0
 # DROPOUT_MID = 0.3
 
 ENCODER_CHANNELS = [1, 16, 32, 64, 128]
-HEAD_HIDDEN = 64
-DROPOUT_HEAD = 0.4
-DROPOUT_MID  = 0.2
+HEAD_HIDDEN = 256
+DROPOUT_HEAD = 0.2
+DROPOUT_MID  = 0.1
 
 # ----- Loss weights -----
-ALPHA = 1.0   # weight for Head A (3-class)
+ALPHA = 2.0   # weight for Head A (3-class)
 BETA = 0.5    # weight for Head B (binary)
 
 # ----- Training -----

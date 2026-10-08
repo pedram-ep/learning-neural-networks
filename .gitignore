@@ -242,4 +242,5 @@ go.work.sum
 ehthumbs.db
 Thumbs.db
 
-cnn-classification-segmentation\data\
+medical-image-cnn/data/
+cnn-classification-segmentation/data/

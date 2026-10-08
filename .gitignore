@@ -241,3 +241,5 @@ go.work.sum
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+cnn-classification-segmentation\data\

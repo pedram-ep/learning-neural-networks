@@ -244,3 +244,4 @@ Thumbs.db
 
 medical-image-cnn/data/
 cnn-classification-segmentation/data/
+cnn-classification-segmentation/results
